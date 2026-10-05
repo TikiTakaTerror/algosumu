@@ -27,18 +27,27 @@ class Grammar:
 
             raw_rules.append((left, right))
 
-        # Some nonterminals may only appear on the right side,
-        # so add those too.
+        # Terminals in two symbol rules need a new nonterminal.
+        terminal_names = {}
+
         for rule in raw_rules:
             right = rule[1]
             right_parts = right.split()
 
             if len(right_parts) == 2:
-                for name in right_parts:
-                    if name not in self.name_to_id:
-                        new_id = len(self.id_to_name)
-                        self.name_to_id[name] = new_id
-                        self.id_to_name.append(name)
+                for symbol in right_parts:
+                    if symbol not in self.name_to_id:
+                        if symbol not in terminal_names:
+                            new_name = "_T" + str(len(terminal_names))
+
+                            while new_name in self.name_to_id:
+                                new_name = "_" + new_name
+
+                            new_id = len(self.id_to_name)
+                            self.name_to_id[new_name] = new_id
+                            self.id_to_name.append(new_name)
+
+                            terminal_names[symbol] = new_name
 
         self.num_nonterminals = len(self.id_to_name)
 
@@ -50,8 +59,7 @@ class Grammar:
             self.terminal_rules.append(set())
             self.binary_rules.append([])
 
-        # Convert the rule names to ids here instead of doing it
-        # while parsing.
+        # Convert the linear rules to ordinary CNF rules.
         for rule in raw_rules:
             left = rule[0]
             right = rule[1]
@@ -63,9 +71,23 @@ class Grammar:
                 self.terminal_rules[A].add(terminal)
 
             elif len(right_parts) == 2:
-                B = self.name_to_id[right_parts[0]]
-                C = self.name_to_id[right_parts[1]]
+                first = right_parts[0]
+                second = right_parts[1]
+
+                if first in terminal_names:
+                    first = terminal_names[first]
+
+                if second in terminal_names:
+                    second = terminal_names[second]
+
+                B = self.name_to_id[first]
+                C = self.name_to_id[second]
                 self.binary_rules[A].append((B, C))
+
+        # Add the terminal rules for the new nonterminals.
+        for terminal, name in terminal_names.items():
+            A = self.name_to_id[name]
+            self.terminal_rules[A].add(terminal)
 
 
 def read_input():
