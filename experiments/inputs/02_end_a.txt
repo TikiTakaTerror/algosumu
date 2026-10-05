@@ -1,0 +1,11 @@
+A -> A B
+A -> A A
+A -> a
+B -> B B
+B -> b
+
+bbbba
+bbbbbba
+bbbbbbbba
+bbbbbbbbbba
+bbbbbbbbbbbba
