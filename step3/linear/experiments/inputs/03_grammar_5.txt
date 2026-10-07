@@ -1,0 +1,8 @@
+S -> a A1
+A1 -> a A2
+A2 -> a A3
+A3 -> a A4
+A4 -> a A4
+A4 -> b
+
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab

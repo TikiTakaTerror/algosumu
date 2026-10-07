@@ -1,15 +1,18 @@
 
 Run
 
-From this experiments folder:
+From this folder:
+
+./run_all.sh
+
+If needed:
 
 chmod +x run_all.sh
 ./run_all.sh
 
-This creates the CSV files in results/.
-
-Then run:
+Then make the plots:
 
 python3 make_plots.py
 
-This creates the figures in plots/.
+The CSV files are created in results/.
+The plot files are created in plots/.

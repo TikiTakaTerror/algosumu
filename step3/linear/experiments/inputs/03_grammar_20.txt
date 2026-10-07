@@ -1,0 +1,23 @@
+S -> a A1
+A1 -> a A2
+A2 -> a A3
+A3 -> a A4
+A4 -> a A5
+A5 -> a A6
+A6 -> a A7
+A7 -> a A8
+A8 -> a A9
+A9 -> a A10
+A10 -> a A11
+A11 -> a A12
+A12 -> a A13
+A13 -> a A14
+A14 -> a A15
+A15 -> a A16
+A16 -> a A17
+A17 -> a A18
+A18 -> a A19
+A19 -> a A19
+A19 -> b
+
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab
