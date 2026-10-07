@@ -27,31 +27,18 @@ class Grammar:
 
             raw_rules.append((left, right))
 
-        # Some nonterminals may only appear on the right side,
-        # so add those too.
-        for rule in raw_rules:
-            right = rule[1]
-            right_parts = right.split()
-
-            if len(right_parts) == 2:
-                for name in right_parts:
-                    if name not in self.name_to_id:
-                        new_id = len(self.id_to_name)
-                        self.name_to_id[name] = new_id
-                        self.id_to_name.append(name)
-
         self.num_nonterminals = len(self.id_to_name)
 
-        # I keep the two CNF rule types separate.
+        # I keep the three linear rule types separate.
         self.terminal_rules = []
-        self.binary_rules = []
+        self.left_terminal_rules = []
+        self.right_terminal_rules = []
 
         for _ in range(self.num_nonterminals):
             self.terminal_rules.append(set())
-            self.binary_rules.append([])
+            self.left_terminal_rules.append([])
+            self.right_terminal_rules.append([])
 
-        # Convert the rule names to ids here instead of doing it
-        # while parsing.
         for rule in raw_rules:
             left = rule[0]
             right = rule[1]
@@ -63,9 +50,18 @@ class Grammar:
                 self.terminal_rules[A].add(terminal)
 
             elif len(right_parts) == 2:
-                B = self.name_to_id[right_parts[0]]
-                C = self.name_to_id[right_parts[1]]
-                self.binary_rules[A].append((B, C))
+                first = right_parts[0]
+                second = right_parts[1]
+
+                if first in self.name_to_id:
+                    B = self.name_to_id[first]
+                    terminal = second
+                    self.right_terminal_rules[A].append((B, terminal))
+
+                else:
+                    terminal = first
+                    B = self.name_to_id[second]
+                    self.left_terminal_rules[A].append((terminal, B))
 
 
 def read_input():
@@ -135,21 +131,28 @@ class Parser:
                 for A in range(number_of_symbols):
                     found = False
 
-                    # For a longer part, try the binary rules for A.
-                    for rule in self.grammar.binary_rules[A]:
+                    # Try rules where the terminal is on the left.
+                    for rule in self.grammar.left_terminal_rules[A]:
+                        terminal = rule[0]
+                        B = rule[1]
+                        self.counter += 1
+
+                        if text[i] == terminal and table[B][i + 1][j]:
+                            table[A][i][j] = True
+                            found = True
+                            break
+
+                    if found:
+                        continue
+
+                    # Try rules where the terminal is on the right.
+                    for rule in self.grammar.right_terminal_rules[A]:
                         B = rule[0]
-                        C = rule[1]
+                        terminal = rule[1]
+                        self.counter += 1
 
-                        # Try the places where the string can be split.
-                        for k in range(i + 1, j):
-                            self.counter += 1
-
-                            if table[B][i][k] and table[C][k][j]:
-                                table[A][i][j] = True
-                                found = True
-                                break
-
-                        if found:
+                        if table[B][i][j - 1] and text[j - 1] == terminal:
+                            table[A][i][j] = True
                             break
 
         return table[self.grammar.start][0][n]

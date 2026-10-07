@@ -1,0 +1,16 @@
+S -> A c
+S -> b
+A -> a S
+A -> a B
+B -> b S
+
+b
+abc
+abbc
+aabcc
+aabbcc
+abaabcc
+ababbcc
+ac
+bc
+abcx
