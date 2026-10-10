@@ -9,8 +9,7 @@ class Grammar:
 
         raw_rules = []
 
-        # Read the left sides first so the ids are fixed.
-        # The rules are stored after that.
+        # I first read the left sides and save the rules.
         for line in grammar_lines:
             parts = line.split("->", 1)
             left = parts[0].strip()
@@ -99,33 +98,35 @@ class Parser:
 
         n = len(text)
         number_of_symbols = self.grammar.num_nonterminals
-        table = []
 
-        # For bottom up I start the whole table as False.
-        for _ in range(number_of_symbols):
-            table_for_A = []
+        # I first fill the answers for parts with one character.
+        previous = []
 
-            for _ in range(n + 1):
-                row = []
+        for A in range(number_of_symbols):
+            row = []
 
-                for _ in range(n + 1):
+            for i in range(n):
+                if text[i] in self.grammar.terminal_rules[A]:
+                    row.append(True)
+                else:
                     row.append(False)
 
-                table_for_A.append(row)
-
-            table.append(table_for_A)
-
-        # I first fill the table for parts with one character.
-        for A in range(number_of_symbols):
-            for i in range(n):
-                character = text[i]
-
-                if character in self.grammar.terminal_rules[A]:
-                    table[A][i][i + 1] = True
+            previous.append(row)
 
         # Then I build the answers from shorter parts to longer parts.
         for length in range(2, n + 1):
-            for i in range(0, n - length + 1):
+            number_of_parts = n - length + 1
+            current = []
+
+            for _ in range(number_of_symbols):
+                row = []
+
+                for _ in range(number_of_parts):
+                    row.append(False)
+
+                current.append(row)
+
+            for i in range(number_of_parts):
                 j = i + length
 
                 for A in range(number_of_symbols):
@@ -137,8 +138,8 @@ class Parser:
                         B = rule[1]
                         self.counter += 1
 
-                        if text[i] == terminal and table[B][i + 1][j]:
-                            table[A][i][j] = True
+                        if text[i] == terminal and previous[B][i + 1]:
+                            current[A][i] = True
                             found = True
                             break
 
@@ -151,11 +152,13 @@ class Parser:
                         terminal = rule[1]
                         self.counter += 1
 
-                        if table[B][i][j - 1] and text[j - 1] == terminal:
-                            table[A][i][j] = True
+                        if previous[B][i] and text[j - 1] == terminal:
+                            current[A][i] = True
                             break
 
-        return table[self.grammar.start][0][n]
+            previous = current
+
+        return previous[self.grammar.start][0]
 
 
 def main():
